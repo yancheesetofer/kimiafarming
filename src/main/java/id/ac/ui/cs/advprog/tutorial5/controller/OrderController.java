@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/order")
@@ -23,32 +24,31 @@ public class OrderController {
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('order:read_all')")
     public ResponseEntity<List<OrderAdminResponse>> getAllOrder() {
-        List<OrderAdminResponse> response = null;
         // TODO: Lengkapi kode berikut
+        List<OrderAdminResponse> response = orderService.findAll();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me")
     @PreAuthorize("hasAuthority('order:read_self')")
     public ResponseEntity<List<OrderUserResponse>> getAllUserOrder() {
-        List<OrderUserResponse> response = null;
         // TODO: Lengkapi kode berikut
+        List<OrderUserResponse> response = orderService.findAllByUserId(getCurrentUser().getId());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('order:create')")
     public ResponseEntity<Order> createOrder(@RequestBody OrderRequest orderRequest) {
-        Order response = null;
-        // TODO: Lengkapi kode berikut
+        Order response = orderService.create(getCurrentUser().getId() , orderRequest);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAuthority('order:update')")
     public ResponseEntity<Order> updateOrder(@PathVariable Integer id, @RequestBody OrderRequest orderRequest) {
-        Order response = null;
         // TODO: Lengkapi kode berikut
+        Order response = orderService.update(getCurrentUser().getId(), id, orderRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -56,6 +56,7 @@ public class OrderController {
     @PreAuthorize("hasAuthority('order:delete')")
     public ResponseEntity<String> deleteOrder(@PathVariable Integer id) {
         // TODO: Lengkapi kode berikut
+        orderService.delete(id);
         return ResponseEntity.ok(String.format("Deleted Order with id %d", id));
     }
 

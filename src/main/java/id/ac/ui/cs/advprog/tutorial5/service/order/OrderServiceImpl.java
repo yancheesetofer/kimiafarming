@@ -3,6 +3,8 @@ package id.ac.ui.cs.advprog.tutorial5.service.order;
 import id.ac.ui.cs.advprog.tutorial5.dto.order.OrderRequest;
 import id.ac.ui.cs.advprog.tutorial5.dto.order.OrderAdminResponse;
 import id.ac.ui.cs.advprog.tutorial5.dto.order.OrderUserResponse;
+import id.ac.ui.cs.advprog.tutorial5.exceptions.MedicineDoesNotExistException;
+import id.ac.ui.cs.advprog.tutorial5.exceptions.OrderDoesNotExistException;
 import id.ac.ui.cs.advprog.tutorial5.model.order.Order;
 import id.ac.ui.cs.advprog.tutorial5.model.order.OrderDetails;
 import id.ac.ui.cs.advprog.tutorial5.repository.MedicineRepository;
@@ -50,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
             var medicine = medicineRepository.findById(details.getMedicineId());
             if (medicine.isEmpty()) {
                 // TODO: Lengkapi kode berikut (Pastikan Anda memanfaatkan Exceptions yang ada!)
-                return;
+                throw new MedicineDoesNotExistException(details.getMedicineId());
             }
             orderDetailsRepository.save(
                     OrderDetails.builder()
@@ -67,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
     public Order update(Integer userId, Integer id, OrderRequest orderRequest) {
         if (isOrderDoesNotExist(id)) {
             // TODO: Lengkapi kode berikut (Pastikan Anda memanfaatkan Exceptions yang ada!)
-            return null;
+            throw new OrderDoesNotExistException(id);
         }
         var order = Order.builder()
                 .id(id)
@@ -81,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
             var medicine = medicineRepository.findById(details.getMedicineId());
             if (medicine.isEmpty()) {
                 // TODO: Lengkapi kode berikut (Pastikan Anda memanfaatkan Exceptions yang ada!)
-                return;
+                throw new MedicineDoesNotExistException(details.getMedicineId());
             }
 
             // Update Order includes the updates of OrderDetails.
@@ -120,6 +122,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void delete(Integer id) {
         // TODO: Lengkapi kode berikut (Pastikan Anda memanfaatkan Exceptions yang ada!)
+        if (isOrderDoesNotExist(id)) {
+            throw new OrderDoesNotExistException(id);
+        }
+        orderRepository.deleteById(id);
     }
 
     private boolean isOrderDoesNotExist(Integer id) {
